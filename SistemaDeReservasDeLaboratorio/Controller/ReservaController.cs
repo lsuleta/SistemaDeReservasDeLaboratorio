@@ -8,5 +8,7 @@ namespace SistemaDeReservasDeLaboratorio.Controller
 {
     internal class ReservaController
     {
+
+
     }
 }

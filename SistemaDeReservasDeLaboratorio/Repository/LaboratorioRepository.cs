@@ -18,7 +18,7 @@ namespace SistemaDeReservasDeLaboratorio.Repository
 
         public void Agregar(Model.Laboratorio entidad)
         {
-            string sql = "INSERT INTO Laboratorios (NumeroAsignado, Ubicacion, Capacidad) VALUES (@NumeroAsignado, @Ubicacion, @Capacidad)";
+            string sql = "INSERT INTO Laboratorios (N  umeroAsignado, Ubicacion, Capacidad) VALUES (@NumeroAsignado, @Ubicacion, @Capacidad)";
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))

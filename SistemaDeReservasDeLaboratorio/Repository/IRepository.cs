@@ -13,6 +13,9 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         void Eliminar(T entidad);
         T ObtenerPorId(int id);
         //List<T> ObtenerTodos();
-        IEnumerable<T> ObtenerTodos();
+        IEnumerable<T> ObtenerTodos()
+        {
+            throw new NotImplementedException("Error al obtener todos ");
+        }
     }
 }
