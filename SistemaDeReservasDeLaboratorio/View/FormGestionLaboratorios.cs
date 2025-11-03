@@ -21,7 +21,7 @@ namespace SistemaDeReservasDeLaboratorio.View
             InitializeComponent();
             string miConnectionString = ConfigurationManager.ConnectionStrings["MiConexionDB"].ConnectionString;
             Repository.LaboratorioRepository laboratorioRepository = new Repository.LaboratorioRepository(miConnectionString);
-            _controller = new LaboratorioController(laboratorioRepository);
+            //_controller = new LaboratorioController(laboratorioRepository);
             //CargarLaboratorios();
         }
 

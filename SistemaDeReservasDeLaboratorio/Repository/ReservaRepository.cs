@@ -19,7 +19,7 @@ namespace SistemaDeReservasDeLaboratorio.Repository
 
         // --- MÉTODO AYUDANTE "FÁBRICA" ---
         // (Lo usamos en todos los 'Obtener...' para no repetir código)
-        private Reserva HydrateReserva(SqlDataReader reader)
+        private Reserva GenerarReserva(SqlDataReader reader)
         {
             string tipoReserva = reader["TipoReserva"].ToString();
             Reserva reserva;
@@ -224,7 +224,7 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                             if (reader.Read())
                             {
                                 // Usamos el método ayudante
-                                return HydrateReserva(reader);
+                                return GenerarReserva(reader);
                             }
                             else
                             {
@@ -255,7 +255,7 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                             while (reader.Read())
                             {
                                 // Usamos el método ayudante
-                                reservas.Add(HydrateReserva(reader));
+                                reservas.Add(GenerarReserva(reader));
                             }
                         }
                     }
@@ -293,7 +293,7 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                         {
                             while (reader.Read())
                             {
-                                reservas.Add(HydrateReserva(reader));
+                                reservas.Add(GenerarReserva(reader));
                             }
                         }
                     }
@@ -324,7 +324,7 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                             // 2. CORREGIDO: La lógica de fábrica va DENTRO del while
                             while (reader.Read())
                             {
-                                reservas.Add(HydrateReserva(reader));
+                                reservas.Add(GenerarReserva(reader));
                             }
                         }
                     }
@@ -355,7 +355,7 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                             // 2. CORREGIDO: La lógica de fábrica va DENTRO del while
                             while (reader.Read())
                             {
-                                reservas.Add(HydrateReserva(reader));
+                                reservas.Add(GenerarReserva(reader));
                             }
                         }
                     }
