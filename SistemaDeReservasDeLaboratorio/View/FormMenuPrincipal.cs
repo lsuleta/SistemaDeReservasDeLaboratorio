@@ -7,7 +7,7 @@ namespace SistemaDeReservasDeLaboratorio
         public FormMenuPrincipal()
         {
             InitializeComponent();
-            this.IsMdiContainer = true;
+            //this.IsMdiContainer = true;
         }
 
         private void laboratoriosToolStripMenuItem_Click(object sender, EventArgs e)

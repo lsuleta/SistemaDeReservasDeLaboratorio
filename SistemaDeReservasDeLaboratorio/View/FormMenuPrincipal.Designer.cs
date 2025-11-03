@@ -47,10 +47,11 @@
             // 
             // menuStrip1
             // 
+            menuStrip1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             menuStrip1.Items.AddRange(new ToolStripItem[] { reservasToolStripMenuItem, laboratoriosToolStripMenuItem, integrantesToolStripMenuItem, salirToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(800, 24);
+            menuStrip1.Size = new Size(800, 29);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -58,68 +59,68 @@
             // 
             reservasToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { altaModificarBajaReservaToolStripMenuItem, consultaDeReservasToolStripMenuItem });
             reservasToolStripMenuItem.Name = "reservasToolStripMenuItem";
-            reservasToolStripMenuItem.Size = new Size(64, 20);
+            reservasToolStripMenuItem.Size = new Size(84, 25);
             reservasToolStripMenuItem.Text = "Reservas";
             reservasToolStripMenuItem.Click += reservasToolStripMenuItem_Click;
             // 
             // altaModificarBajaReservaToolStripMenuItem
             // 
             altaModificarBajaReservaToolStripMenuItem.Name = "altaModificarBajaReservaToolStripMenuItem";
-            altaModificarBajaReservaToolStripMenuItem.Size = new Size(218, 22);
+            altaModificarBajaReservaToolStripMenuItem.Size = new Size(269, 26);
             altaModificarBajaReservaToolStripMenuItem.Text = "Alta/Modificar/Baja reserva";
             altaModificarBajaReservaToolStripMenuItem.Click += altaModificarBajaReservaToolStripMenuItem_Click;
             // 
             // consultaDeReservasToolStripMenuItem
             // 
             consultaDeReservasToolStripMenuItem.Name = "consultaDeReservasToolStripMenuItem";
-            consultaDeReservasToolStripMenuItem.Size = new Size(218, 22);
+            consultaDeReservasToolStripMenuItem.Size = new Size(269, 26);
             consultaDeReservasToolStripMenuItem.Text = "Consulta de reservas";
             // 
             // laboratoriosToolStripMenuItem
             // 
             laboratoriosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { altaModificarEliminarLaboratorioToolStripMenuItem, consultToolStripMenuItem });
             laboratoriosToolStripMenuItem.Name = "laboratoriosToolStripMenuItem";
-            laboratoriosToolStripMenuItem.Size = new Size(85, 20);
+            laboratoriosToolStripMenuItem.Size = new Size(110, 25);
             laboratoriosToolStripMenuItem.Text = "Laboratorios";
             laboratoriosToolStripMenuItem.Click += laboratoriosToolStripMenuItem_Click;
             // 
             // altaModificarEliminarLaboratorioToolStripMenuItem
             // 
             altaModificarEliminarLaboratorioToolStripMenuItem.Name = "altaModificarEliminarLaboratorioToolStripMenuItem";
-            altaModificarEliminarLaboratorioToolStripMenuItem.Size = new Size(260, 22);
+            altaModificarEliminarLaboratorioToolStripMenuItem.Size = new Size(323, 26);
             altaModificarEliminarLaboratorioToolStripMenuItem.Text = "Alta/Modificar/Eliminar laboratorio";
             altaModificarEliminarLaboratorioToolStripMenuItem.Click += altaModificarEliminarLaboratorioToolStripMenuItem_Click;
             // 
             // consultToolStripMenuItem
             // 
             consultToolStripMenuItem.Name = "consultToolStripMenuItem";
-            consultToolStripMenuItem.Size = new Size(260, 22);
+            consultToolStripMenuItem.Size = new Size(323, 26);
             consultToolStripMenuItem.Text = "Consulta de laboratorios";
             // 
             // integrantesToolStripMenuItem
             // 
             integrantesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lucasSuletaToolStripMenuItem, emanuelHamuiToolStripMenuItem });
             integrantesToolStripMenuItem.Name = "integrantesToolStripMenuItem";
-            integrantesToolStripMenuItem.Size = new Size(78, 20);
+            integrantesToolStripMenuItem.Size = new Size(100, 25);
             integrantesToolStripMenuItem.Text = "Integrantes";
             integrantesToolStripMenuItem.Click += integrantesToolStripMenuItem_Click;
             // 
             // lucasSuletaToolStripMenuItem
             // 
             lucasSuletaToolStripMenuItem.Name = "lucasSuletaToolStripMenuItem";
-            lucasSuletaToolStripMenuItem.Size = new Size(159, 22);
+            lucasSuletaToolStripMenuItem.Size = new Size(190, 26);
             lucasSuletaToolStripMenuItem.Text = "Lucas Suleta";
             // 
             // emanuelHamuiToolStripMenuItem
             // 
             emanuelHamuiToolStripMenuItem.Name = "emanuelHamuiToolStripMenuItem";
-            emanuelHamuiToolStripMenuItem.Size = new Size(159, 22);
+            emanuelHamuiToolStripMenuItem.Size = new Size(190, 26);
             emanuelHamuiToolStripMenuItem.Text = "Emanuel Hamui";
             // 
             // salirToolStripMenuItem
             // 
             salirToolStripMenuItem.Name = "salirToolStripMenuItem";
-            salirToolStripMenuItem.Size = new Size(41, 20);
+            salirToolStripMenuItem.Size = new Size(53, 25);
             salirToolStripMenuItem.Text = "Salir";
             salirToolStripMenuItem.Click += salirToolStripMenuItem_Click;
             // 
@@ -127,9 +128,9 @@
             // 
             pictureBox1.Dock = DockStyle.Fill;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(0, 24);
+            pictureBox1.Location = new Point(0, 29);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(800, 426);
+            pictureBox1.Size = new Size(800, 421);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
