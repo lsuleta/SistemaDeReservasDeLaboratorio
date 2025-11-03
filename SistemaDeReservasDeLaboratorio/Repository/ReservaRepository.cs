@@ -16,38 +16,88 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         {
             _connectionString = connectionString;
         }
+
+        // --- MÉTODO AYUDANTE "FÁBRICA" ---
+        // (Lo usamos en todos los 'Obtener...' para no repetir código)
+        private Reserva HydrateReserva(SqlDataReader reader)
+        {
+            string tipoReserva = reader["TipoReserva"].ToString();
+            Reserva reserva;
+
+            if (tipoReserva == "Cuatrimestral")
+            {
+                var rc = new ReservaCuatrimestral
+                {
+                    // Llenamos propiedades de la clase hija
+                    HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
+                    HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
+                    Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
+                };
+                // Llenamos la fecha "virtual"
+                rc.Fecha = rc.HoraInicio;
+                reserva = rc;
+            }
+            else if (tipoReserva == "Eventual")
+            {
+                var re = new ReservaEventual
+                {
+                    // Llenamos propiedades de la clase hija
+                    FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
+                    CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
+                };
+                // Llenamos la fecha "virtual"
+                re.Fecha = re.FechaComienzoReserva;
+                reserva = re;
+            }
+            else
+            {
+                throw new Exception("Tipo de reserva desconocido.");
+            }
+
+            // Llenamos las propiedades de la clase base (comunes)
+            reserva.ID = Convert.ToInt32(reader["ReservaID"]);
+            reserva.LaboratorioID = Convert.ToInt32(reader["LaboratorioID"]);
+            reserva.Carrera = reader["Carrera"].ToString();
+            reserva.Asignatura = reader["Asignatura"].ToString();
+            reserva.Anio = reader["Anio"].ToString(); // ¡Corregido a String!
+            reserva.Comision = reader["Comision"].ToString();
+            reserva.Profesor = reader["Profesor"].ToString();
+
+            return reserva;
+        }
         public void Agregar(Reserva entidad)
         {
-            //string sql = "INSERT INTO Reserva (Carrera, Asignatura, Anio, Comision, Profesor) VALUES (@Carrera, @Asignatura, @anio, @comision, @Profesor)";
             string sql = @"
                 INSERT INTO Reserva 
-                (TipoReserva, Carrera, Asignatura, Anio, Comision, Profesor, 
+                (LaboratorioID, TipoReserva, Carrera, Asignatura, Anio, Comision, Profesor, 
                  FechaHoraComienzo, FechaHoraFinalizacion, Frecuencia, 
                  FechaComienzoReserva, CantidadSemanas)
                 VALUES 
-                (@Tipo, @Carrera, @Asignatura, @Anio, @Comision, @Profesor,
+                (@LabID, @Tipo, @Carrera, @Asignatura, @Anio, @Comision, @Profesor,
                  @F_H_Inicio, @F_H_Fin, @Frecuencia,
-                 @F_Inicio_Ev, @CantSemanas)";
+                 @F_Inicio_Ev, @CantSemanas);
+                SELECT SCOPE_IDENTITY();"; // Para obtener el nuevo ID
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
+                        // Parámetros comunes (¡con los tipos corregidos!)
+                        command.Parameters.AddWithValue("@LabID", entidad.LaboratorioID);
                         command.Parameters.AddWithValue("@Carrera", entidad.Carrera);
                         command.Parameters.AddWithValue("@Asignatura", entidad.Asignatura);
-                        command.Parameters.AddWithValue("@Anio", entidad.Anio);
+                        command.Parameters.AddWithValue("@Anio", entidad.Anio); // Ahora es string
                         command.Parameters.AddWithValue("@Comision", entidad.Comision);
                         command.Parameters.AddWithValue("@Profesor", entidad.Profesor);
 
+                        // Lógica de tipo (esta estaba bien)
                         if (entidad is ReservaCuatrimestral rc)
                         {
                             command.Parameters.AddWithValue("@Tipo", "Cuatrimestral");
                             command.Parameters.AddWithValue("@F_H_Inicio", rc.HoraInicio);
                             command.Parameters.AddWithValue("@F_H_Fin", rc.HoraFin);
                             command.Parameters.AddWithValue("@Frecuencia", rc.Frecuencia.ToString());
-
-                            // Columnas de 'Eventual' van como NULL
                             command.Parameters.AddWithValue("@F_Inicio_Ev", DBNull.Value);
                             command.Parameters.AddWithValue("@CantSemanas", DBNull.Value);
                         }
@@ -56,19 +106,17 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                             command.Parameters.AddWithValue("@Tipo", "Eventual");
                             command.Parameters.AddWithValue("@F_Inicio_Ev", re.FechaComienzoReserva);
                             command.Parameters.AddWithValue("@CantSemanas", re.CantidadDeSemanas);
-
-                            // Columnas de 'Cuatrimestral' van como NULL
                             command.Parameters.AddWithValue("@F_H_Inicio", DBNull.Value);
                             command.Parameters.AddWithValue("@F_H_Fin", DBNull.Value);
                             command.Parameters.AddWithValue("@Frecuencia", DBNull.Value);
                         }
-                        else
-                        {
-                            throw new ArgumentException("El tipo de reserva no es soportado.");
-                        }
+                        else { throw new ArgumentException("El tipo de reserva no es soportado."); }
+
                         connection.Open();
-                        command.ExecuteNonQuery();
-                        entidad.ID = (int)command.ExecuteScalar();
+
+                        // 2. EJECUCIÓN CORREGIDA: Usamos ExecuteScalar
+                        object result = command.ExecuteScalar();
+                        entidad.ID = Convert.ToInt32(result);
                     }
                 }
             }
@@ -77,22 +125,26 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                 throw new Exception("Error al agregar la reserva.", ex);
             }
         }
-
         public void Actualizar(Reserva entidad)
         {
             string sql = @"
-                    UPDATE Reserva SET
-                        LaboratorioID = @LabID, TipoReserva = @Tipo, Carrera = @Carr, ,
-                        Asignatura = @Asignatura, Anio = @Anio   Comision = @Comision, 
-                        Profesor = @Profesor, FechaHoraComienzo = @F_H_Inicio, FechaHoraFinalizacion = @F_H_Fin,
-                        Frecuencia = @Frecuencia, FechaComienzoReserva = @F_Inicio_Ev, CantidadSemanas = @CantSemanas
-                        WHERE ReservaID = @ReservaID";
+                UPDATE Reserva SET
+                    LaboratorioID = @LabID, TipoReserva = @Tipo, Carrera = @Carrera,
+                    Asignatura = @Asignatura, Anio = @Anio, Comision = @Comision, 
+                    Profesor = @Profesor, FechaHoraComienzo = @F_H_Inicio, 
+                    FechaHoraFinalizacion = @F_H_Fin,
+                    Frecuencia = @Frecuencia, FechaComienzoReserva = @F_Inicio_Ev, 
+                    CantidadSemanas = @CantSemanas
+                WHERE ReservaID = @ReservaID";
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
+                        command.Parameters.AddWithValue("@ReservaID", entidad.ID);
+                        command.Parameters.AddWithValue("@LabID", entidad.LaboratorioID);
                         command.Parameters.AddWithValue("@Carrera", entidad.Carrera);
                         command.Parameters.AddWithValue("@Asignatura", entidad.Asignatura);
                         command.Parameters.AddWithValue("@Anio", entidad.Anio);
@@ -128,15 +180,14 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                         connection.Open();
                         command.ExecuteNonQuery();
 
-                    }
+                    }                   
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al actualiza la reserva.", ex);
+                throw new Exception("Error al actualizar la reserva.", ex);
             }
         }
-
         public void Eliminar(Reserva entidad)
         {
             string sql = "DELETE FROM Reserva WHERE ReservaID = @ReservaID";
@@ -157,7 +208,6 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                 throw new Exception("Error al eliminar la reserva.", ex);
             }
         }
-
         public Reserva ObtenerPorId(int id)
         {
             string sql = "SELECT * From Reserva WHERE ReservaID = @ReservaID";
@@ -173,46 +223,12 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                         {
                             if (reader.Read())
                             {
-                                string tipoReserva = reader["TipoReserva"].ToString();
-                                if (tipoReserva == "Cuatrimestral")
-                                {
-                                    ReservaCuatrimestral rc = new ReservaCuatrimestral
-                                    {
-                                        ID = Convert.ToInt32(reader["ReservaID"]),
-                                        Carrera = reader["Carrera"].ToString(),
-                                        Asignatura = reader["Asignatura"].ToString(),
-                                        Anio = Convert.ToInt32(reader["Anio"]),
-                                        Comision = reader["Comision"].ToString(),
-                                        Profesor = reader["Profesor"].ToString(),
-                                        HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
-                                        HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
-                                        Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
-                                    };
-                                    return rc;
-                                }
-                                else if (tipoReserva == "Eventual")
-                                {
-                                    ReservaEventual re = new ReservaEventual
-                                    {
-                                        ID = Convert.ToInt32(reader["ReservaID"]),
-                                        Carrera = reader["Carrera"].ToString(),
-                                        Asignatura = reader["Asignatura"].ToString(),
-                                        Anio = Convert.ToInt32(reader["Anio"]),
-                                        Comision = reader["Comision"].ToString(),
-                                        Profesor = reader["Profesor"].ToString(),
-                                        FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
-                                        CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
-                                    };
-                                    return re;
-                                }
-                                else
-                                {
-                                    throw new Exception("Tipo de reserva desconocido.");
-                                }
+                                // Usamos el método ayudante
+                                return HydrateReserva(reader);
                             }
                             else
                             {
-                                return null; // O lanzar una excepción si se prefiere
+                                return null;
                             }
                         }
                     }
@@ -222,7 +238,6 @@ namespace SistemaDeReservasDeLaboratorio.Repository
             {
                 throw new Exception("Error al obtener la reserva por ID.", ex);
             }
-
         }
         public List<Reserva> ObtenerTodos()
         {
@@ -239,42 +254,8 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                         {
                             while (reader.Read())
                             {
-                                string tipoReserva = reader["TipoReserva"].ToString();
-                                if (tipoReserva == "Cuatrimestral")
-                                {
-                                    ReservaCuatrimestral rc = new ReservaCuatrimestral
-                                    {
-                                        ID = Convert.ToInt32(reader["ReservaID"]),
-                                        Carrera = reader["Carrera"].ToString(),
-                                        Asignatura = reader["Asignatura"].ToString(),
-                                        Anio = Convert.ToInt32(reader["Anio"]),
-                                        Comision = reader["Comision"].ToString(),
-                                        Profesor = reader["Profesor"].ToString(),
-                                        HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
-                                        HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
-                                        Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
-                                    };
-                                    reservas.Add(rc);
-                                }
-                                else if (tipoReserva == "Eventual")
-                                {
-                                    ReservaEventual re = new ReservaEventual
-                                    {
-                                        ID = Convert.ToInt32(reader["ReservaID"]),
-                                        Carrera = reader["Carrera"].ToString(),
-                                        Asignatura = reader["Asignatura"].ToString(),
-                                        Anio = Convert.ToInt32(reader["Anio"]),
-                                        Comision = reader["Comision"].ToString(),
-                                        Profesor = reader["Profesor"].ToString(),
-                                        FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
-                                        CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
-                                    };
-                                    reservas.Add(re);
-                                }
-                                else
-                                {
-                                    throw new Exception("Tipo de reserva desconocido.");
-                                }
+                                // Usamos el método ayudante
+                                reservas.Add(HydrateReserva(reader));
                             }
                         }
                     }
@@ -285,25 +266,12 @@ namespace SistemaDeReservasDeLaboratorio.Repository
             {
                 throw new Exception("Error al obtener todas las reservas.", ex);
             }
-
         }
-
         public List<Reserva> ObtenerPorFecha(DateTime fecha)
         {
             List<Reserva> reservas = new List<Reserva>();
-
             string sql = @"
-                SELECT 
-                    -- Comunes
-                    ReservaID, TipoReserva, Carrera, Asignatura, Anio, Comision, Profesor,
-            
-                    -- Específicas (para la fábrica)
-                    FechaHoraComienzo, FechaHoraFinalizacion, Frecuencia,
-                    FechaComienzoReserva, CantidadSemanas
-            
-                FROM Reserva
-        
-                -- El WHERE que ya tenías (está perfecto)
+                SELECT * FROM Reserva
                 WHERE CAST(
                     (CASE 
                         WHEN TipoReserva = 'Eventual' 
@@ -311,66 +279,32 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                         ELSE FechaHoraComienzo 
                     END)
                 AS DATE) = CAST(@FechaBuscada AS DATE)";
-
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
+                        // 1. CORREGIDO: Faltaba el parámetro
+                        command.Parameters.AddWithValue("@FechaBuscada", fecha);
 
                         connection.Open();
-
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                string tipoReserva = reader["TipoReserva"].ToString();
-
-                                if (tipoReserva == "Cuatrimestral")
-                                {
-                                    ReservaCuatrimestral rc = new ReservaCuatrimestral
-                                    {
-                                        ID = Convert.ToInt32(reader["ReservaID"]),
-                                        Carrera = reader["Carrera"].ToString(),
-                                        Asignatura = reader["Asignatura"].ToString(),
-                                        Anio = Convert.ToInt32(reader["Anio"]),
-                                        Comision = reader["Comision"].ToString(),
-                                        Profesor = reader["Profesor"].ToString(),
-                                        HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
-                                        HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
-                                        Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
-                                    };
-                                    reservas.Add(rc);
-                                }
-                                else if (tipoReserva == "Eventual")
-                                {
-                                    ReservaEventual re = new ReservaEventual
-                                    {
-                                        ID = Convert.ToInt32(reader["ReservaID"]),
-                                        Carrera = reader["Carrera"].ToString(),
-                                        Asignatura = reader["Asignatura"].ToString(),
-                                        Anio = Convert.ToInt32(reader["Anio"]),
-                                        Comision = reader["Comision"].ToString(),
-                                        Profesor = reader["Profesor"].ToString(),
-                                        FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
-                                        CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
-                                    };
-                                    reservas.Add(re);
-                                }
+                                reservas.Add(HydrateReserva(reader));
                             }
                         }
                     }
                 }
                 return reservas;
             }
-
             catch (Exception ex)
             {
                 throw new Exception("Error al obtener las reservas por fecha.", ex);
-            }           
+            }
         }
-
         public List<Reserva> ObtenerPorProfesor(string profesor)
         {
             string sql = "SELECT * From Reserva WHERE Profesor = @Profesor";
@@ -381,41 +315,16 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                 {
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
+                        // 1. CORREGIDO: Faltaba el parámetro
+                        command.Parameters.AddWithValue("@Profesor", profesor);
+
                         connection.Open();
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            string tipoReserva = reader["TipoReserva"].ToString();
-
-                            if (tipoReserva == "Cuatrimestral")
+                            // 2. CORREGIDO: La lógica de fábrica va DENTRO del while
+                            while (reader.Read())
                             {
-                                ReservaCuatrimestral rc = new ReservaCuatrimestral
-                                {
-                                    ID = Convert.ToInt32(reader["ReservaID"]),
-                                    Carrera = reader["Carrera"].ToString(),
-                                    Asignatura = reader["Asignatura"].ToString(),
-                                    Anio = Convert.ToInt32(reader["Anio"]),
-                                    Comision = reader["Comision"].ToString(),
-                                    Profesor = reader["Profesor"].ToString(),
-                                    HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
-                                    HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
-                                    Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
-                                };
-                                reservas.Add(rc);
-                            }
-                            else if (tipoReserva == "Eventual")
-                            {
-                                ReservaEventual re = new ReservaEventual
-                                {
-                                    ID = Convert.ToInt32(reader["ReservaID"]),
-                                    Carrera = reader["Carrera"].ToString(),
-                                    Asignatura = reader["Asignatura"].ToString(),
-                                    Anio = Convert.ToInt32(reader["Anio"]),
-                                    Comision = reader["Comision"].ToString(),
-                                    Profesor = reader["Profesor"].ToString(),
-                                    FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
-                                    CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
-                                };
-                                reservas.Add(re);
+                                reservas.Add(HydrateReserva(reader));
                             }
                         }
                     }
@@ -424,12 +333,12 @@ namespace SistemaDeReservasDeLaboratorio.Repository
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al obtener los profesores", ex);
+                throw new Exception("Error al obtener por profesor", ex);
             }
         }
         public List<Reserva> ObtenerPorAsignatura(string asignatura)
         {
-            string sql = "Select * From Reserva WHERE Asignatura = @Asignatura";
+            string sql = "SELECT * From Reserva WHERE Asignatura = @Asignatura";
             List<Reserva> reservas = new List<Reserva>();
             try
             {
@@ -437,41 +346,16 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                 {
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
+                        // 1. CORREGIDO: Faltaba el parámetro
+                        command.Parameters.AddWithValue("@Asignatura", asignatura);
+
                         connection.Open();
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            string tipoReserva = reader["TipoReserva"].ToString();
-
-                            if (tipoReserva == "Cuatrimestral")
+                            // 2. CORREGIDO: La lógica de fábrica va DENTRO del while
+                            while (reader.Read())
                             {
-                                ReservaCuatrimestral rc = new ReservaCuatrimestral
-                                {
-                                    ID = Convert.ToInt32(reader["ReservaID"]),
-                                    Carrera = reader["Carrera"].ToString(),
-                                    Asignatura = reader["Asignatura"].ToString(),
-                                    Anio = Convert.ToInt32(reader["Anio"]),
-                                    Comision = reader["Comision"].ToString(),
-                                    Profesor = reader["Profesor"].ToString(),
-                                    HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
-                                    HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
-                                    Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
-                                };
-                                reservas.Add(rc);
-                            }
-                            else if (tipoReserva == "Eventual")
-                            {
-                                ReservaEventual re = new ReservaEventual
-                                {
-                                    ID = Convert.ToInt32(reader["ReservaID"]),
-                                    Carrera = reader["Carrera"].ToString(),
-                                    Asignatura = reader["Asignatura"].ToString(),
-                                    Anio = Convert.ToInt32(reader["Anio"]),
-                                    Comision = reader["Comision"].ToString(),
-                                    Profesor = reader["Profesor"].ToString(),
-                                    FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
-                                    CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
-                                };
-                                reservas.Add(re);
+                                reservas.Add(HydrateReserva(reader));
                             }
                         }
                     }
@@ -480,8 +364,8 @@ namespace SistemaDeReservasDeLaboratorio.Repository
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al obtener los profesores", ex);
+                throw new Exception("Error al obtener por asignatura", ex);
             }
-        }
+        }   
     }
 }

@@ -9,12 +9,16 @@ namespace SistemaDeReservasDeLaboratorio.Model
     public abstract class Reserva
     {
         public int ID { get; set; }
+
+        public int LaboratorioID { get; set; }
         public string Carrera { get; set; }
         public string Asignatura { get; set; }
-        public int Anio { get; set; }
+        public string Anio { get; set; }
         public string Comision { get; set; }
         public string Profesor { get; set; }
         public DateTime Fecha { get; set; }
+
+        public Laboratorio Laboratorio { get; set; }
     }
         public enum FrecuenciaReserva
         {
