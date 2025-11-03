@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SistemaDeReservasDeLaboratorio.Model;
 namespace SistemaDeReservasDeLaboratorio.Controller
 {
-    internal class LaboratorioController
+    public class LaboratorioController
     {
         private readonly Repository.ILaboratorioRepository _laboratorioRepository;
         public LaboratorioController(Repository.ILaboratorioRepository laboratorioRepository)
@@ -19,9 +19,21 @@ namespace SistemaDeReservasDeLaboratorio.Controller
             {
                 throw new ArgumentNullException(nameof(laboratorio), "El laboratorio no puede ser nulo");
             }
+
+            if (string.IsNullOrEmpty(laboratorio.NumeroAsignado.ToString()))
+            {
+                throw new Exception("EL numero de laboratorio no puede estar vacio.");
+            }
+
+            var existente = _laboratorioRepository.ObtenerTodos()
+                .FirstOrDefault(l => l.NumeroAsignado == laboratorio.NumeroAsignado);
+            
+            if (existente != null)
+                throw new Exception($"Ya existe un laboratorio con el número asignado {laboratorio.NumeroAsignado}.");
+
             _laboratorioRepository.Agregar(laboratorio);
         }
-        public Laboratorio ObtenerLaboratoriosPorId(int id)
+        public Laboratorio ObtenerLaboratorioPorId(int id)
         {
             var Laboratorio = _laboratorioRepository.ObtenerPorId(id);
             if (Laboratorio == null)

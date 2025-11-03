@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SistemaDeReservasDeLaboratorio.Repository
 {
-    internal interface ILaboratorioRepository : IRepository<Model.Laboratorio>
+    public interface ILaboratorioRepository : IRepository<Model.Laboratorio>
     {      
     }
 }
