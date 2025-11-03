@@ -14,7 +14,6 @@ namespace SistemaDeReservasDeLaboratorio
         {
             FormGestionLaboratorios formLaboratorios = new FormGestionLaboratorios();
 
-            //formLaboratorios.MdiParent = this;
             formLaboratorios.Show();
         }
 

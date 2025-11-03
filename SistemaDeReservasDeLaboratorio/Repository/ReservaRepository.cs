@@ -239,33 +239,28 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                 throw new Exception("Error al obtener la reserva por ID.", ex);
             }
         }
-        public List<Reserva> ObtenerTodos()
+        public IEnumerable<Reserva> ObtenerTodos()
         {
+            // Dejá solo la lógica, sin 'try-catch'
             string sql = "SELECT * From Reserva";
             List<Reserva> reservas = new List<Reserva>();
-            try
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
-                                // Usamos el método ayudante
-                                reservas.Add(GenerarReserva(reader));
-                            }
+                            // Usamos el método ayudante
+                            reservas.Add(GenerarReserva(reader));
                         }
                     }
                 }
-                return reservas;
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Error al obtener todas las reservas.", ex);
-            }
+            return reservas;
         }
         public List<Reserva> ObtenerPorFecha(DateTime fecha)
         {
@@ -366,6 +361,61 @@ namespace SistemaDeReservasDeLaboratorio.Repository
             {
                 throw new Exception("Error al obtener por asignatura", ex);
             }
-        }   
+        }
+        public List<string> ObtenerProfesoresDistintos()
+        {
+            List<string> profesores = new List<string>();
+            string sql = "SELECT DISTINCT Profesor FROM Reserva ORDER BY Profesor";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                profesores.Add(reader["Profesor"].ToString());
+                            }
+                        }
+                    }
+                }
+                return profesores;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener lista de profesores.", ex);
+            }
+        }
+        public List<string> ObtenerAsignaturasDistintas()
+        {
+            List<string> asignaturas = new List<string>();
+            string sql = "SELECT DISTINCT Asignatura FROM Reserva ORDER BY Asignatura";
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                asignaturas.Add(reader["Asignatura"].ToString());
+                            }
+                        }
+                    }
+                }
+                return asignaturas;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener lista de asignaturas.", ex);
+            }
+        }
     }
 }
