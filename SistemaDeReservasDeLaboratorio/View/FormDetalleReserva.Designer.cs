@@ -43,17 +43,17 @@
             cmbProfesor = new ComboBox();
             cmbAsignatura = new ComboBox();
             gbCuatrimestral = new GroupBox();
-            gbEventual = new GroupBox();
-            label8 = new Label();
-            label9 = new Label();
-            label10 = new Label();
-            label11 = new Label();
-            dateTimePicker1 = new DateTimePicker();
-            dateTimePicker2 = new DateTimePicker();
             comboBox1 = new ComboBox();
-            label12 = new Label();
-            dateTimePicker3 = new DateTimePicker();
+            dateTimePicker2 = new DateTimePicker();
+            dateTimePicker1 = new DateTimePicker();
+            label11 = new Label();
+            label9 = new Label();
+            label8 = new Label();
+            gbEventual = new GroupBox();
             numericUpDown1 = new NumericUpDown();
+            dateTimePicker3 = new DateTimePicker();
+            label12 = new Label();
+            label10 = new Label();
             btnGuardar = new Button();
             btnSalir = new Button();
             ((System.ComponentModel.ISupportInitialize)nudAnio).BeginInit();
@@ -193,6 +193,57 @@
             gbCuatrimestral.TabStop = false;
             gbCuatrimestral.Text = "Cuatrimestral";
             // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(102, 108);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(200, 23);
+            comboBox1.TabIndex = 21;
+            // 
+            // dateTimePicker2
+            // 
+            dateTimePicker2.Format = DateTimePickerFormat.Time;
+            dateTimePicker2.Location = new Point(102, 69);
+            dateTimePicker2.Name = "dateTimePicker2";
+            dateTimePicker2.Size = new Size(200, 23);
+            dateTimePicker2.TabIndex = 20;
+            // 
+            // dateTimePicker1
+            // 
+            dateTimePicker1.Format = DateTimePickerFormat.Time;
+            dateTimePicker1.Location = new Point(102, 36);
+            dateTimePicker1.Name = "dateTimePicker1";
+            dateTimePicker1.Size = new Size(200, 23);
+            dateTimePicker1.TabIndex = 19;
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new Point(17, 111);
+            label11.Name = "label11";
+            label11.Size = new Size(64, 15);
+            label11.TabIndex = 18;
+            label11.Text = "Frecuencia";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(17, 75);
+            label9.Name = "label9";
+            label9.Size = new Size(50, 15);
+            label9.TabIndex = 17;
+            label9.Text = "Hora fin";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(17, 42);
+            label8.Name = "label8";
+            label8.Size = new Size(65, 15);
+            label8.TabIndex = 0;
+            label8.Text = "Hora inicio";
+            // 
             // gbEventual
             // 
             gbEventual.Controls.Add(numericUpDown1);
@@ -206,63 +257,20 @@
             gbEventual.TabStop = false;
             gbEventual.Text = "Eventual";
             // 
-            // label8
+            // numericUpDown1
             // 
-            label8.AutoSize = true;
-            label8.Location = new Point(17, 42);
-            label8.Name = "label8";
-            label8.Size = new Size(65, 15);
-            label8.TabIndex = 0;
-            label8.Text = "Hora inicio";
+            numericUpDown1.Location = new Point(154, 73);
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(200, 23);
+            numericUpDown1.TabIndex = 17;
             // 
-            // label9
+            // dateTimePicker3
             // 
-            label9.AutoSize = true;
-            label9.Location = new Point(17, 75);
-            label9.Name = "label9";
-            label9.Size = new Size(50, 15);
-            label9.TabIndex = 17;
-            label9.Text = "Hora fin";
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Location = new Point(29, 44);
-            label10.Name = "label10";
-            label10.Size = new Size(93, 15);
-            label10.TabIndex = 17;
-            label10.Text = "Fecha comienzo";
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Location = new Point(17, 111);
-            label11.Name = "label11";
-            label11.Size = new Size(64, 15);
-            label11.TabIndex = 18;
-            label11.Text = "Frecuencia";
-            // 
-            // dateTimePicker1
-            // 
-            dateTimePicker1.Location = new Point(102, 36);
-            dateTimePicker1.Name = "dateTimePicker1";
-            dateTimePicker1.Size = new Size(200, 23);
-            dateTimePicker1.TabIndex = 19;
-            // 
-            // dateTimePicker2
-            // 
-            dateTimePicker2.Location = new Point(102, 69);
-            dateTimePicker2.Name = "dateTimePicker2";
-            dateTimePicker2.Size = new Size(200, 23);
-            dateTimePicker2.TabIndex = 20;
-            // 
-            // comboBox1
-            // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(102, 108);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(200, 23);
-            comboBox1.TabIndex = 21;
+            dateTimePicker3.Format = DateTimePickerFormat.Short;
+            dateTimePicker3.Location = new Point(154, 38);
+            dateTimePicker3.Name = "dateTimePicker3";
+            dateTimePicker3.Size = new Size(200, 23);
+            dateTimePicker3.TabIndex = 19;
             // 
             // label12
             // 
@@ -273,19 +281,14 @@
             label12.TabIndex = 18;
             label12.Text = "Cantidad semanas";
             // 
-            // dateTimePicker3
+            // label10
             // 
-            dateTimePicker3.Location = new Point(154, 38);
-            dateTimePicker3.Name = "dateTimePicker3";
-            dateTimePicker3.Size = new Size(200, 23);
-            dateTimePicker3.TabIndex = 19;
-            // 
-            // numericUpDown1
-            // 
-            numericUpDown1.Location = new Point(154, 73);
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(200, 23);
-            numericUpDown1.TabIndex = 17;
+            label10.AutoSize = true;
+            label10.Location = new Point(29, 44);
+            label10.Name = "label10";
+            label10.Size = new Size(93, 15);
+            label10.TabIndex = 17;
+            label10.Text = "Fecha comienzo";
             // 
             // btnGuardar
             // 
@@ -304,6 +307,7 @@
             btnSalir.TabIndex = 18;
             btnSalir.Text = "Salir";
             btnSalir.UseVisualStyleBackColor = true;
+            btnSalir.Click += btnSalir_Click;
             // 
             // FormDetalleReserva
             // 

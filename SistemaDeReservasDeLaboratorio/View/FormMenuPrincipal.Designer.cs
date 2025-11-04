@@ -142,6 +142,7 @@
             ClientSize = new Size(800, 450);
             Controls.Add(pictureBox1);
             Controls.Add(menuStrip1);
+            IsMdiContainer = true;
             MainMenuStrip = menuStrip1;
             Name = "FormMenuPrincipal";
             Text = "Form1";

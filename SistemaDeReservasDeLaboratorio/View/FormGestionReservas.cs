@@ -31,21 +31,27 @@ namespace SistemaDeReservasDeLaboratorio.View
             CargarReservas();
         }
         private void CargarReservas()
-        {           
-                //List<Model.Reserva> listaReserva = _controller.ObtenerTodasLasReservas();
-                dgvReserva.DataSource = null;
-                //dgvReserva.DataSource = listaReserva;
-                var reservas = _controller.ObtenerTodasLasReservas();
+        {
+            //List<Model.Reserva> listaReserva = _controller.ObtenerTodasLasReservas();
+            dgvReserva.DataSource = null;
+            //dgvReserva.DataSource = listaReserva;
+            var reservas = _controller.ObtenerTodasLasReservas();
 
-                var listaReservas = reservas.ToList();
+            var listaReservas = reservas.ToList();
 
-                dgvReserva.DataSource = listaReservas;
-                       
+            dgvReserva.DataSource = listaReservas;
+
         }
 
         private void btnNuevo_Click(object sender, EventArgs e)
         {
-            
+            FormDetalleReserva formDetalleReserva = new FormDetalleReserva();
+            formDetalleReserva.ShowDialog();
+        }
+
+        private void btnSalir_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
