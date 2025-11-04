@@ -41,9 +41,8 @@
             txtComision = new TextBox();
             nudAnio = new NumericUpDown();
             cmbProfesor = new ComboBox();
-            cmbAsignatura = new ComboBox();
             gbCuatrimestral = new GroupBox();
-            comboBox1 = new ComboBox();
+            cmbFrecuencia = new ComboBox();
             dateTimePicker2 = new DateTimePicker();
             dateTimePicker1 = new DateTimePicker();
             label11 = new Label();
@@ -56,6 +55,7 @@
             label10 = new Label();
             btnGuardar = new Button();
             btnSalir = new Button();
+            textBox1 = new TextBox();
             ((System.ComponentModel.ISupportInitialize)nudAnio).BeginInit();
             gbCuatrimestral.SuspendLayout();
             gbEventual.SuspendLayout();
@@ -170,17 +170,9 @@
             cmbProfesor.Size = new Size(121, 23);
             cmbProfesor.TabIndex = 13;
             // 
-            // cmbAsignatura
-            // 
-            cmbAsignatura.FormattingEnabled = true;
-            cmbAsignatura.Location = new Point(366, 91);
-            cmbAsignatura.Name = "cmbAsignatura";
-            cmbAsignatura.Size = new Size(121, 23);
-            cmbAsignatura.TabIndex = 14;
-            // 
             // gbCuatrimestral
             // 
-            gbCuatrimestral.Controls.Add(comboBox1);
+            gbCuatrimestral.Controls.Add(cmbFrecuencia);
             gbCuatrimestral.Controls.Add(dateTimePicker2);
             gbCuatrimestral.Controls.Add(dateTimePicker1);
             gbCuatrimestral.Controls.Add(label11);
@@ -193,13 +185,13 @@
             gbCuatrimestral.TabStop = false;
             gbCuatrimestral.Text = "Cuatrimestral";
             // 
-            // comboBox1
+            // cmbFrecuencia
             // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(102, 108);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(200, 23);
-            comboBox1.TabIndex = 21;
+            cmbFrecuencia.FormattingEnabled = true;
+            cmbFrecuencia.Location = new Point(102, 108);
+            cmbFrecuencia.Name = "cmbFrecuencia";
+            cmbFrecuencia.Size = new Size(200, 23);
+            cmbFrecuencia.TabIndex = 21;
             // 
             // dateTimePicker2
             // 
@@ -309,16 +301,23 @@
             btnSalir.UseVisualStyleBackColor = true;
             btnSalir.Click += btnSalir_Click;
             // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(366, 91);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(121, 23);
+            textBox1.TabIndex = 19;
+            // 
             // FormDetalleReserva
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(textBox1);
             Controls.Add(btnSalir);
             Controls.Add(btnGuardar);
             Controls.Add(gbEventual);
             Controls.Add(gbCuatrimestral);
-            Controls.Add(cmbAsignatura);
             Controls.Add(cmbProfesor);
             Controls.Add(nudAnio);
             Controls.Add(txtComision);
@@ -334,6 +333,7 @@
             Controls.Add(label1);
             Name = "FormDetalleReserva";
             Text = "FormDetalleReserva";
+            Load += FormDetalleReserva_Load;
             ((System.ComponentModel.ISupportInitialize)nudAnio).EndInit();
             gbCuatrimestral.ResumeLayout(false);
             gbCuatrimestral.PerformLayout();
@@ -359,9 +359,8 @@
         private TextBox txtComision;
         private NumericUpDown nudAnio;
         private ComboBox cmbProfesor;
-        private ComboBox cmbAsignatura;
         private GroupBox gbCuatrimestral;
-        private ComboBox comboBox1;
+        private ComboBox cmbFrecuencia;
         private DateTimePicker dateTimePicker2;
         private DateTimePicker dateTimePicker1;
         private Label label11;
@@ -374,5 +373,6 @@
         private Label label10;
         private Button btnGuardar;
         private Button btnSalir;
+        private TextBox textBox1;
     }
 }

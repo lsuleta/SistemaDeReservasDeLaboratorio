@@ -63,6 +63,13 @@ namespace SistemaDeReservasDeLaboratorio.Repository
             reserva.Comision = reader["Comision"].ToString();
             reserva.Profesor = reader["Profesor"].ToString();
 
+            reserva.Laboratorio = new Laboratorio
+            {
+                LaboratorioID = Convert.ToInt32(reader["LaboratorioID"]),
+                NumeroAsignado = Convert.ToInt32(reader["NumeroAsignado"]),
+                Ubicacion = reader["UbicacionPiso"].ToString(),
+                Capacidad = Convert.ToInt32(reader["CapacidadPuestos"])
+            };
             return reserva;
         }
         public void Agregar(Reserva entidad)
@@ -210,7 +217,16 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         }
         public Reserva ObtenerPorId(int id)
         {
-            string sql = "SELECT * From Reserva WHERE ReservaID = @ReservaID";
+            string sql = @"
+        SELECT 
+            R.ReservaID, R.LaboratorioID, R.TipoReserva, R.Carrera, R.Asignatura, 
+            R.Anio, R.Comision, R.Profesor,
+            R.FechaHoraComienzo, R.FechaHoraFinalizacion, R.Frecuencia,
+            R.FechaComienzoReserva, R.CantidadSemanas,
+            L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos
+        FROM Reserva R
+        INNER JOIN Laboratorio L ON R.LaboratorioID = L.LaboratorioID
+        WHERE R.ReservaID = @ReservaID";
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -242,8 +258,16 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         public IEnumerable<Reserva> ObtenerTodos()
         {
             // Dejá solo la lógica, sin 'try-catch'
-            string sql = "SELECT * From Reserva";
             List<Reserva> reservas = new List<Reserva>();
+            string sql = @"
+        SELECT 
+            R.ReservaID, R.LaboratorioID, R.TipoReserva, R.Carrera, R.Asignatura, 
+            R.Anio, R.Comision, R.Profesor,
+            R.FechaHoraComienzo, R.FechaHoraFinalizacion, R.Frecuencia,
+            R.FechaComienzoReserva, R.CantidadSemanas,
+            L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos
+        FROM Reserva R
+        INNER JOIN Laboratorio L ON R.LaboratorioID = L.LaboratorioID";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -266,14 +290,21 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         {
             List<Reserva> reservas = new List<Reserva>();
             string sql = @"
-                SELECT * FROM Reserva
-                WHERE CAST(
-                    (CASE 
-                        WHEN TipoReserva = 'Eventual' 
-                        THEN FechaComienzoReserva 
-                        ELSE FechaHoraComienzo 
-                    END)
-                AS DATE) = CAST(@FechaBuscada AS DATE)";
+        SELECT 
+            R.ReservaID, R.LaboratorioID, R.TipoReserva, R.Carrera, R.Asignatura, 
+            R.Anio, R.Comision, R.Profesor,
+            R.FechaHoraComienzo, R.FechaHoraFinalizacion, R.Frecuencia,
+            R.FechaComienzoReserva, R.CantidadSemanas,
+            L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos
+        FROM Reserva R
+        INNER JOIN Laboratorio L ON R.LaboratorioID = L.LaboratorioID
+        WHERE CAST(
+            (CASE 
+                WHEN R.TipoReserva = 'Eventual' 
+                THEN R.FechaComienzoReserva 
+                ELSE R.FechaHoraComienzo 
+            END)
+        AS DATE) = CAST(@FechaBuscada AS DATE)";
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -302,8 +333,17 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         }
         public List<Reserva> ObtenerPorProfesor(string profesor)
         {
-            string sql = "SELECT * From Reserva WHERE Profesor = @Profesor";
             List<Reserva> reservas = new List<Reserva>();
+            string sql = @"
+        SELECT 
+            R.ReservaID, R.LaboratorioID, R.TipoReserva, R.Carrera, R.Asignatura, 
+            R.Anio, R.Comision, R.Profesor,
+            R.FechaHoraComienzo, R.FechaHoraFinalizacion, R.Frecuencia,
+            R.FechaComienzoReserva, R.CantidadSemanas,
+            L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos
+        FROM Reserva R
+        INNER JOIN Laboratorio L ON R.LaboratorioID = L.LaboratorioID
+        WHERE R.Profesor LIKE @Profesor";
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -333,8 +373,24 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         }
         public List<Reserva> ObtenerPorAsignatura(string asignatura)
         {
-            string sql = "SELECT * From Reserva WHERE Asignatura = @Asignatura";
+            
             List<Reserva> reservas = new List<Reserva>();
+            string sql = @"
+        SELECT 
+            R.ReservaID, R.LaboratorioID, R.TipoReserva, R.Carrera, R.Asignatura, 
+            R.Anio, R.Comision, R.Profesor,
+            R.FechaHoraComienzo, R.FechaHoraFinalizacion, R.Frecuencia,
+            R.FechaComienzoReserva, R.CantidadSemanas,
+            L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos
+        FROM Reserva R
+        INNER JOIN Laboratorio L ON R.LaboratorioID = L.LaboratorioID
+        WHERE CAST(
+            (CASE 
+                WHEN R.TipoReserva = 'Eventual' 
+                THEN R.FechaComienzoReserva 
+                ELSE R.FechaHoraComienzo 
+            END)
+        AS DATE) = CAST(@FechaBuscada AS DATE)";
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
