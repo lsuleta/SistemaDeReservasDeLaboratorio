@@ -30,21 +30,21 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                 {
                     var rc = new ReservaCuatrimestral
                     {
-                        HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
-                        HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
-                        Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
+                        HoraInicio = reader["FechaHoraComienzo"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["FechaHoraComienzo"]),
+                        HoraFin = reader["FechaHoraFinalizacion"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
+                        Frecuencia = reader["Frecuencia"] == DBNull.Value ? (FrecuenciaReserva?)null : (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
                     };
-                    rc.Fecha = rc.HoraInicio;
+                    rc.Fecha = rc.HoraInicio.GetValueOrDefault(); // Usamos GetValueOrDefault
                     reserva = rc;
                 }
                 else if (tipoReserva == "Eventual")
                 {
                     var re = new ReservaEventual
                     {
-                        FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
-                        CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
+                        FechaComienzoReserva = reader["FechaComienzoReserva"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["FechaComienzoReserva"]),
+                        CantidadDeSemanas = reader["CantidadSemanas"] == DBNull.Value ? (int?)null : Convert.ToInt32(reader["CantidadSemanas"])
                     };
-                    re.Fecha = re.FechaComienzoReserva;
+                    re.Fecha = re.FechaComienzoReserva.GetValueOrDefault(); // Usamos GetValueOrDefault
                     reserva = re;
                 }
                 else

@@ -73,14 +73,14 @@ namespace SistemaDeReservasDeLaboratorio.View
                 if (_reservaActual is ReservaEventual re)
                 {
                     cmbReserva.SelectedItem = TipoReserva.Eventual;
-                    dtpFecha.Value = re.FechaComienzoReserva;
-                    nudCantidadSemanas.Value = re.CantidadDeSemanas;
+                    dtpFecha.Value = re.FechaComienzoReserva.GetValueOrDefault();
+                    nudCantidadSemanas.Value = (decimal)re.CantidadDeSemanas;
                 }
                 else if (_reservaActual is ReservaCuatrimestral rc)
                 {
                     cmbReserva.SelectedItem = TipoReserva.Cuatrimestral;
-                    dtpHoraInicio.Value = DateTime.Today.Add(rc.HoraInicio.TimeOfDay);
-                    dtpHoraFin.Value = DateTime.Today.Add(rc.HoraFin.TimeOfDay);
+                    dtpHoraInicio.Value = rc.HoraInicio.GetValueOrDefault(DateTime.Today);
+                    dtpHoraFin.Value = rc.HoraFin.GetValueOrDefault(DateTime.Today);
                     cmbFrecuencia.SelectedItem = rc.Frecuencia.ToString();
                 }
 

@@ -17,8 +17,12 @@ namespace SistemaDeReservasDeLaboratorio.Model
         public string Comision { get; set; }
         public string Profesor { get; set; }
         public DateTime Fecha { get; set; }
-
         public Laboratorio Laboratorio { get; set; }
+        public virtual DateTime? HoraInicio { get; set; }
+        public virtual DateTime? HoraFin { get; set; }
+        public virtual FrecuenciaReserva? Frecuencia { get; set; }
+        public virtual DateTime? FechaComienzoReserva { get; set; }
+        public virtual int? CantidadDeSemanas { get; set; }
     }
         public enum FrecuenciaReserva
         {
@@ -34,17 +38,17 @@ namespace SistemaDeReservasDeLaboratorio.Model
 
     public class ReservaEventual : Reserva
     {
-        public DateTime FechaComienzoReserva { get; set; }
-        public int CantidadDeSemanas { get; set; }
+        public override DateTime? FechaComienzoReserva { get; set; }
+        public override int? CantidadDeSemanas { get; set; }
 
         public ReservaEventual() { }
     }
 
     public class ReservaCuatrimestral : Reserva
     {       
-        public DateTime HoraInicio { get; set; }
-        public DateTime HoraFin { get; set; }
-        public FrecuenciaReserva Frecuencia {  get; set; }
+        public override DateTime? HoraInicio { get; set; }
+        public override DateTime? HoraFin { get; set; }
+        public override FrecuenciaReserva? Frecuencia {  get; set; }
        
 
         public ReservaCuatrimestral () { }

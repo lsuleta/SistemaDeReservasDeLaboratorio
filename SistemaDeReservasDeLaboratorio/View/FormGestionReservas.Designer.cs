@@ -33,6 +33,7 @@
             btnModificar = new Button();
             btnNuevo = new Button();
             dgvReserva = new DataGridView();
+            colLaboratorioNum = new DataGridViewTextBoxColumn();
             dtpFechaReserva = new DateTimePicker();
             cmbAsignatura = new ComboBox();
             cmbProfesor = new ComboBox();
@@ -40,7 +41,9 @@
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
-            colLaboratorioNum = new DataGridViewTextBoxColumn();
+            btnFiltrar = new Button();
+            btnLimpiarFiltros = new Button();
+            chkUsarFecha = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)dgvReserva).BeginInit();
             SuspendLayout();
             // 
@@ -97,10 +100,15 @@
             dgvReserva.TabIndex = 5;
             dgvReserva.CellFormatting += dgvReserva_CellFormatting;
             // 
+            // colLaboratorioNum
+            // 
+            colLaboratorioNum.HeaderText = "Laboratorio";
+            colLaboratorioNum.Name = "colLaboratorioNum";
+            // 
             // dtpFechaReserva
             // 
             dtpFechaReserva.Format = DateTimePickerFormat.Short;
-            dtpFechaReserva.Location = new Point(645, 406);
+            dtpFechaReserva.Location = new Point(645, 412);
             dtpFechaReserva.Name = "dtpFechaReserva";
             dtpFechaReserva.Size = new Size(121, 23);
             dtpFechaReserva.TabIndex = 10;
@@ -108,7 +116,7 @@
             // cmbAsignatura
             // 
             cmbAsignatura.FormattingEnabled = true;
-            cmbAsignatura.Location = new Point(645, 464);
+            cmbAsignatura.Location = new Point(645, 469);
             cmbAsignatura.Name = "cmbAsignatura";
             cmbAsignatura.Size = new Size(121, 23);
             cmbAsignatura.TabIndex = 11;
@@ -116,7 +124,7 @@
             // cmbProfesor
             // 
             cmbProfesor.FormattingEnabled = true;
-            cmbProfesor.Location = new Point(645, 435);
+            cmbProfesor.Location = new Point(645, 440);
             cmbProfesor.Name = "cmbProfesor";
             cmbProfesor.Size = new Size(121, 23);
             cmbProfesor.TabIndex = 12;
@@ -157,16 +165,44 @@
             label4.TabIndex = 16;
             label4.Text = "Asignatura";
             // 
-            // colLaboratorioNum
+            // btnFiltrar
             // 
-            colLaboratorioNum.HeaderText = "Laboratorio";
-            colLaboratorioNum.Name = "colLaboratorioNum";
+            btnFiltrar.Location = new Point(800, 468);
+            btnFiltrar.Name = "btnFiltrar";
+            btnFiltrar.Size = new Size(75, 23);
+            btnFiltrar.TabIndex = 17;
+            btnFiltrar.Text = "Filtrar";
+            btnFiltrar.UseVisualStyleBackColor = true;
+            btnFiltrar.Click += btnFiltrar_Click;
+            // 
+            // btnLimpiarFiltros
+            // 
+            btnLimpiarFiltros.Location = new Point(893, 445);
+            btnLimpiarFiltros.Name = "btnLimpiarFiltros";
+            btnLimpiarFiltros.Size = new Size(75, 47);
+            btnLimpiarFiltros.TabIndex = 18;
+            btnLimpiarFiltros.Text = "Limpiar filtros";
+            btnLimpiarFiltros.UseVisualStyleBackColor = true;
+            btnLimpiarFiltros.Click += btnLimpiarFiltros_Click;
+            // 
+            // chkUsarFecha
+            // 
+            chkUsarFecha.AutoSize = true;
+            chkUsarFecha.Location = new Point(800, 415);
+            chkUsarFecha.Name = "chkUsarFecha";
+            chkUsarFecha.Size = new Size(80, 19);
+            chkUsarFecha.TabIndex = 19;
+            chkUsarFecha.Text = "UsarFecha";
+            chkUsarFecha.UseVisualStyleBackColor = true;
             // 
             // FormGestionReservas
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1027, 508);
+            Controls.Add(chkUsarFecha);
+            Controls.Add(btnLimpiarFiltros);
+            Controls.Add(btnFiltrar);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -202,5 +238,8 @@
         private Label label3;
         private Label label4;
         private DataGridViewTextBoxColumn colLaboratorioNum;
+        private Button btnFiltrar;
+        private Button btnLimpiarFiltros;
+        private CheckBox chkUsarFecha;
     }
 }

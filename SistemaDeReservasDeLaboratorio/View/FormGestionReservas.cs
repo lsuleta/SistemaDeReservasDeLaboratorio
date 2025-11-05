@@ -33,12 +33,11 @@ namespace SistemaDeReservasDeLaboratorio.View
         private void FormGestionReservas_Load(object sender, EventArgs e)
         {
             CargarReservas();
+            CargarFiltros();
         }
         private void CargarReservas()
         {
-            //List<Model.Reserva> listaReserva = _controller.ObtenerTodasLasReservas();
             dgvReserva.DataSource = null;
-            //dgvReserva.DataSource = listaReserva;
             var reservas = _controllerReserva.ObtenerTodasLasReservas();
 
             var listaReservas = reservas.ToList();
@@ -47,13 +46,23 @@ namespace SistemaDeReservasDeLaboratorio.View
 
             if (dgvReserva.Columns["ID"] != null)
                 dgvReserva.Columns["ID"].Visible = false;
+
             if (dgvReserva.Columns["LaboratorioID"] != null)
                 dgvReserva.Columns["LaboratorioID"].Visible = false;
 
             if (dgvReserva.Columns["Fecha"] != null)
+                dgvReserva.Columns["Fecha"].Visible = false;
+
+            if (dgvReserva.Columns["HoraInicio"] != null)
             {
-                dgvReserva.Columns["Fecha"].DefaultCellStyle.Format = "HH:mm";
-                dgvReserva.Columns["Fecha"].HeaderText = "Hora"; // (Opcional) Cambia el título
+                dgvReserva.Columns["HoraInicio"].DefaultCellStyle.Format = "HH:mm";
+                dgvReserva.Columns["HoraInicio"].HeaderText = "Hora inicio"; 
+            }
+
+            if (dgvReserva.Columns["HoraFin"] != null)
+            {
+                dgvReserva.Columns["HoraFin"].DefaultCellStyle.Format = "HH:mm";
+                dgvReserva.Columns["HoraFin"].HeaderText = "Hora fin";
             }
 
             if (dgvReserva.Columns["Laboratorio"] != null)
@@ -61,6 +70,26 @@ namespace SistemaDeReservasDeLaboratorio.View
                 dgvReserva.Columns["Laboratorio"].Visible = false;
             }
 
+        }
+
+        private void CargarFiltros()
+        {
+            try
+            {
+                cmbProfesor.DataSource = null;
+                cmbProfesor.DataSource = _repoReserva.ObtenerProfesoresDistintos().ToList();
+                cmbProfesor.SelectedItem = null;
+                cmbProfesor.Text = "Seleccione un profesor";
+
+                cmbAsignatura.DataSource = null;
+                cmbAsignatura.DataSource = _repoReserva.ObtenerAsignaturasDistintas().ToList();
+                cmbAsignatura.SelectedItem = null;
+                cmbAsignatura.Text = "Seleccione una asignatura";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al cargar los filtros: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnNuevo_Click(object sender, EventArgs e)
@@ -76,7 +105,6 @@ namespace SistemaDeReservasDeLaboratorio.View
                 CargarReservas();
                 MessageBox.Show("Reserva agregada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            //formDetalleReserva.ShowDialog();
         }
 
         private void btnSalir_Click(object sender, EventArgs e)
@@ -121,36 +149,78 @@ namespace SistemaDeReservasDeLaboratorio.View
         {
             if (this.dgvReserva.Columns[e.ColumnIndex].Name == "colLaboratorioNum")
             {
-                // 2. Nos aseguramos de que la fila tenga un objeto
                 if (e.RowIndex >= 0 && this.dgvReserva.Rows[e.RowIndex].DataBoundItem != null)
                 {
                     try
                     {
-                        // 3. Obtenemos el objeto 'Reserva' completo de esa fila
                         Reserva reserva = this.dgvReserva.Rows[e.RowIndex].DataBoundItem as Reserva;
 
                         if (reserva != null && reserva.Laboratorio != null)
                         {
-                            // 4. ¡LA CORRECCIÓN!
-                            //    Convertimos el número a un string
                             e.Value = reserva.Laboratorio.NumeroAsignado.ToString();
                             e.FormattingApplied = true;
                         }
                         else
                         {
-                            // Si el laboratorio es null, ponemos un string vacío
                             e.Value = string.Empty;
                             e.FormattingApplied = true;
                         }
                     }
                     catch (Exception)
                     {
-                        // Si algo falla, ponemos un texto de error
                         e.Value = "ERR";
                         e.FormattingApplied = true;
                     }
                 }
             }
+        }
+
+        private void btnFiltrar_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                
+                List<Reserva> reservasFiltradas = _controllerReserva.ObtenerTodasLasReservas().ToList();
+                IEnumerable<Reserva> resultado = reservasFiltradas;
+
+                string profesor = cmbProfesor.SelectedItem as string;
+                if (!string.IsNullOrEmpty(profesor))
+                {
+                    resultado = resultado.Where(r => r.Profesor == profesor);
+                }
+                string asignatura = cmbAsignatura.SelectedItem as string;
+                if (!string.IsNullOrEmpty(asignatura))
+                {
+                    resultado = resultado.Where(r => r.Asignatura == asignatura);
+                }
+                if (chkUsarFecha.Checked)
+                {
+                    DateTime fecha = dtpFechaReserva.Value;
+                    resultado = resultado.Where(r => r.Fecha.Date == fecha.Date);
+                }
+
+                dgvReserva.DataSource = null;
+                dgvReserva.DataSource = resultado.ToList();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al filtrar las reservas: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnLimpiarFiltros_Click(object sender, EventArgs e)
+        {
+            cmbProfesor.SelectedItem = null;
+            cmbProfesor.Text = "Seleccione un profesor";
+
+            cmbAsignatura.SelectedItem = null;
+            cmbAsignatura.Text = "Seleccione una asignatura";
+
+            chkUsarFecha.Checked = false;
+
+            CargarReservas();
         }
     }
 }
