@@ -40,6 +40,7 @@
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
+            colLaboratorioNum = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dgvReserva).BeginInit();
             SuspendLayout();
             // 
@@ -70,6 +71,7 @@
             btnModificar.TabIndex = 7;
             btnModificar.Text = "Modificar";
             btnModificar.UseVisualStyleBackColor = true;
+            btnModificar.Click += btnModificar_Click;
             // 
             // btnNuevo
             // 
@@ -83,12 +85,17 @@
             // 
             // dgvReserva
             // 
+            dgvReserva.AllowUserToOrderColumns = true;
+            dgvReserva.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvReserva.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dgvReserva.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvReserva.Columns.AddRange(new DataGridViewColumn[] { colLaboratorioNum });
             dgvReserva.Location = new Point(0, -1);
             dgvReserva.Name = "dgvReserva";
             dgvReserva.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvReserva.Size = new Size(1038, 377);
+            dgvReserva.Size = new Size(1026, 377);
             dgvReserva.TabIndex = 5;
+            dgvReserva.CellFormatting += dgvReserva_CellFormatting;
             // 
             // dtpFechaReserva
             // 
@@ -150,11 +157,16 @@
             label4.TabIndex = 16;
             label4.Text = "Asignatura";
             // 
+            // colLaboratorioNum
+            // 
+            colLaboratorioNum.HeaderText = "Laboratorio";
+            colLaboratorioNum.Name = "colLaboratorioNum";
+            // 
             // FormGestionReservas
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1040, 508);
+            ClientSize = new Size(1027, 508);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -189,5 +201,6 @@
         private Label label2;
         private Label label3;
         private Label label4;
+        private DataGridViewTextBoxColumn colLaboratorioNum;
     }
 }

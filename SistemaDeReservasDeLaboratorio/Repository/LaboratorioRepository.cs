@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SistemaDeReservasDeLaboratorio.Repository
 {
-    internal class LaboratorioRepository : ILaboratorioRepository
+    public class LaboratorioRepository : ILaboratorioRepository
     {
         private string _connectionString;
 

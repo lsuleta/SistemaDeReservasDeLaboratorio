@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using SistemaDeReservasDeLaboratorio.Model;
 namespace SistemaDeReservasDeLaboratorio.Repository
 {
-    internal class ReservaRepository : IReservaRepository
+    public class ReservaRepository : IReservaRepository
     {
 
         private string _connectionString;
@@ -18,59 +18,66 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         }
 
         // --- MÉTODO AYUDANTE "FÁBRICA" ---
-        // (Lo usamos en todos los 'Obtener...' para no repetir código)
         private Reserva GenerarReserva(SqlDataReader reader)
         {
-            string tipoReserva = reader["TipoReserva"].ToString();
-            Reserva reserva;
+            Reserva reserva = null; 
 
-            if (tipoReserva == "Cuatrimestral")
+            try
             {
-                var rc = new ReservaCuatrimestral
+                string tipoReserva = reader["TipoReserva"].ToString();
+
+                if (tipoReserva == "Cuatrimestral")
                 {
-                    // Llenamos propiedades de la clase hija
-                    HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
-                    HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
-                    Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
-                };
-                // Llenamos la fecha "virtual"
-                rc.Fecha = rc.HoraInicio;
-                reserva = rc;
-            }
-            else if (tipoReserva == "Eventual")
-            {
-                var re = new ReservaEventual
+                    var rc = new ReservaCuatrimestral
+                    {
+                        HoraInicio = Convert.ToDateTime(reader["FechaHoraComienzo"]),
+                        HoraFin = Convert.ToDateTime(reader["FechaHoraFinalizacion"]),
+                        Frecuencia = (FrecuenciaReserva)Enum.Parse(typeof(FrecuenciaReserva), reader["Frecuencia"].ToString())
+                    };
+                    rc.Fecha = rc.HoraInicio;
+                    reserva = rc;
+                }
+                else if (tipoReserva == "Eventual")
                 {
-                    // Llenamos propiedades de la clase hija
-                    FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
-                    CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
+                    var re = new ReservaEventual
+                    {
+                        FechaComienzoReserva = Convert.ToDateTime(reader["FechaComienzoReserva"]),
+                        CantidadDeSemanas = Convert.ToInt32(reader["CantidadSemanas"])
+                    };
+                    re.Fecha = re.FechaComienzoReserva;
+                    reserva = re;
+                }
+                else
+                {
+                    throw new Exception("Tipo de reserva desconocido.");
+                }
+
+                reserva.ID = Convert.ToInt32(reader["ReservaID"]);
+                reserva.LaboratorioID = Convert.ToInt32(reader["LaboratorioID"]);
+                reserva.Carrera = reader["Carrera"].ToString();
+                reserva.Asignatura = reader["Asignatura"].ToString();
+                reserva.Anio = reader["Anio"].ToString();
+                reserva.Comision = reader["Comision"].ToString();
+                reserva.Profesor = reader["Profesor"].ToString();
+
+                reserva.Laboratorio = new Laboratorio
+                {
+                    LaboratorioID = Convert.ToInt32(reader["LaboratorioID"]),
+                    NumeroAsignado = Convert.ToInt32(reader["NumeroAsignado"]),
+                    Ubicacion = reader["UbicacionPiso"].ToString(),
+                    Capacidad = Convert.ToInt32(reader["CapacidadPuestos"])
                 };
-                // Llenamos la fecha "virtual"
-                re.Fecha = re.FechaComienzoReserva;
-                reserva = re;
-            }
-            else
-            {
-                throw new Exception("Tipo de reserva desconocido.");
-            }
 
-            // Llenamos las propiedades de la clase base (comunes)
-            reserva.ID = Convert.ToInt32(reader["ReservaID"]);
-            reserva.LaboratorioID = Convert.ToInt32(reader["LaboratorioID"]);
-            reserva.Carrera = reader["Carrera"].ToString();
-            reserva.Asignatura = reader["Asignatura"].ToString();
-            reserva.Anio = reader["Anio"].ToString(); // ¡Corregido a String!
-            reserva.Comision = reader["Comision"].ToString();
-            reserva.Profesor = reader["Profesor"].ToString();
-
-            reserva.Laboratorio = new Laboratorio
+                return reserva;
+            }
+            catch (Exception ex)
             {
-                LaboratorioID = Convert.ToInt32(reader["LaboratorioID"]),
-                NumeroAsignado = Convert.ToInt32(reader["NumeroAsignado"]),
-                Ubicacion = reader["UbicacionPiso"].ToString(),
-                Capacidad = Convert.ToInt32(reader["CapacidadPuestos"])
-            };
-            return reserva;
+                MessageBox.Show($"¡Error DENTRO de GenerarReserva!\n\n{ex.Message}",
+                                "Error de Conversión",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return reserva;
+            }
         }
         public void Agregar(Reserva entidad)
         {
@@ -182,8 +189,6 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                             throw new ArgumentException("El tipo de reserva no es soportado.");
                         }
 
-
-                        command.Parameters.AddWithValue("@ReservaID", entidad.ID);
                         connection.Open();
                         command.ExecuteNonQuery();
 
@@ -218,15 +223,15 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         public Reserva ObtenerPorId(int id)
         {
             string sql = @"
-        SELECT 
-            R.ReservaID, R.LaboratorioID, R.TipoReserva, R.Carrera, R.Asignatura, 
-            R.Anio, R.Comision, R.Profesor,
-            R.FechaHoraComienzo, R.FechaHoraFinalizacion, R.Frecuencia,
-            R.FechaComienzoReserva, R.CantidadSemanas,
-            L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos
-        FROM Reserva R
-        INNER JOIN Laboratorio L ON R.LaboratorioID = L.LaboratorioID
-        WHERE R.ReservaID = @ReservaID";
+                SELECT 
+                    R.*, L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos 
+                FROM 
+                    Reserva R
+                INNER JOIN 
+                    Laboratorio L ON R.LaboratorioID = L.LaboratorioID
+                WHERE 
+                    R.ReservaID = @ReservaID";
+        
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -260,14 +265,13 @@ namespace SistemaDeReservasDeLaboratorio.Repository
             // Dejá solo la lógica, sin 'try-catch'
             List<Reserva> reservas = new List<Reserva>();
             string sql = @"
-        SELECT 
-            R.ReservaID, R.LaboratorioID, R.TipoReserva, R.Carrera, R.Asignatura, 
-            R.Anio, R.Comision, R.Profesor,
-            R.FechaHoraComienzo, R.FechaHoraFinalizacion, R.Frecuencia,
-            R.FechaComienzoReserva, R.CantidadSemanas,
-            L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos
-        FROM Reserva R
-        INNER JOIN Laboratorio L ON R.LaboratorioID = L.LaboratorioID";
+            SELECT 
+                R.*, 
+                L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos 
+            FROM 
+                Reserva R
+            INNER JOIN 
+                Laboratorio L ON R.LaboratorioID = L.LaboratorioID";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -335,28 +339,25 @@ namespace SistemaDeReservasDeLaboratorio.Repository
         {
             List<Reserva> reservas = new List<Reserva>();
             string sql = @"
-        SELECT 
-            R.ReservaID, R.LaboratorioID, R.TipoReserva, R.Carrera, R.Asignatura, 
-            R.Anio, R.Comision, R.Profesor,
-            R.FechaHoraComienzo, R.FechaHoraFinalizacion, R.Frecuencia,
-            R.FechaComienzoReserva, R.CantidadSemanas,
-            L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos
-        FROM Reserva R
-        INNER JOIN Laboratorio L ON R.LaboratorioID = L.LaboratorioID
-        WHERE R.Profesor LIKE @Profesor";
+                SELECT 
+                    R.*, L.NumeroAsignado, L.UbicacionPiso, L.CapacidadPuestos 
+                FROM 
+                    Reserva R
+                INNER JOIN 
+                    Laboratorio L ON R.LaboratorioID = L.LaboratorioID
+                WHERE 
+                    R.Profesor = @Profesor";
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        // 1. CORREGIDO: Faltaba el parámetro
                         command.Parameters.AddWithValue("@Profesor", profesor);
 
                         connection.Open();
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            // 2. CORREGIDO: La lógica de fábrica va DENTRO del while
                             while (reader.Read())
                             {
                                 reservas.Add(GenerarReserva(reader));
@@ -397,13 +398,11 @@ namespace SistemaDeReservasDeLaboratorio.Repository
                 {
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        // 1. CORREGIDO: Faltaba el parámetro
                         command.Parameters.AddWithValue("@Asignatura", asignatura);
 
                         connection.Open();
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            // 2. CORREGIDO: La lógica de fábrica va DENTRO del while
                             while (reader.Read())
                             {
                                 reservas.Add(GenerarReserva(reader));

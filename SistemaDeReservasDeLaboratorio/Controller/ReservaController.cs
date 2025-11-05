@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SistemaDeReservasDeLaboratorio.Model;
 namespace SistemaDeReservasDeLaboratorio.Controller
 {
-    internal class ReservaController
+    public class ReservaController
     {
         private readonly Repository.IReservaRepository _reservaRepository;
 

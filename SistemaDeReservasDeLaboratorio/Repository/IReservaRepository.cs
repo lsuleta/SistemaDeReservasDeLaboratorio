@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SistemaDeReservasDeLaboratorio.Repository
 {
-    internal interface IReservaRepository : IRepository<Model.Reserva>
+    public interface IReservaRepository : IRepository<Model.Reserva>
     {
         IEnumerable<Model.Reserva> ObtenerPorFecha(DateTime fecha)
         {
